@@ -2,13 +2,13 @@ import React, { useState } from "react";
 
 export default function PropertyForm() {
   const [formData, setFormData] = useState({
-    name: "Property name",
-    location: "property location",
-    price: "Property price",
-    distance: "nearest location (ex:- 10 km from sangareddy)",
-    purpose: "your purpose [rent/sale/lease]",
-    contact: "Contact phone number",
-    dimensions: " dimension of plot (3000 sq ft)",
+    name: "",
+    location: "",
+    price: "",
+    distance: "",
+    purpose: "",
+    contact: "",
+    dimensions: "",
     description:
       "Some description about your venture...",
     image: [ ],
