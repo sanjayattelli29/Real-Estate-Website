@@ -25,9 +25,9 @@ const Projects = () => {
       </div>
       <div className="grid grid-cols-1 gap-4 mt-8 sm:grid-cols-2 md:grid-cols-3">
         {projects.map(({ id, name, number, image }) => (
-          <div key={id} className="relative w-full group">
+          <div key={id} className="relative w-full group" >
             <div className="overflow-hidden">
-              <Link className="!opacity-100">
+              <Link className="!opacity-100"  to="/contact">
                 <img
                   src={image[0]}
                   alt={name}

@@ -22,7 +22,7 @@ const SingleProductCard = ({
       } shadow-light dark:border-card-dark border rounded-lg overflow-hidden relative group`}
     >
       <div className="group !opacity-100 overflow-hidden relative">
-        <Link to="/" className="!opacity-100">
+        <Link to="/contact" className="!opacity-100">
           <img
             src={image[0]}
             alt={name}

@@ -21,7 +21,7 @@ const SingleProductCardFullWidth = ({
     <div className="relative grid grid-cols-1 gap-3 mt-3 overflow-hidden border rounded-lg shadow-light sm:grid-cols-3 md:grid-cols-4 dark:border-card-dark group">
       <div className="sm:col-span-1">
         <div className="group !opacity-100 overflow-hidden relative h-full">
-          <Link to="/" className="!opacity-100">
+          <Link to="/contact" className="!opacity-100">
             <img
               src={image[0]}
               alt={name}
