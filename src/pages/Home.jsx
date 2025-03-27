@@ -24,10 +24,10 @@ const Home = () => {
       <Services />
       <Featured />
       <Counter />
-      <Projects />
+      {/* <Projects /> */}
       <Testimonial />
       <Brands />
-      <Feeds />
+      {/* <Feeds /> */}
     </div>
   );
 };

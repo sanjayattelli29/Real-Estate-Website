@@ -24,7 +24,7 @@ const SingleProductCard = ({
       <div className="group !opacity-100 overflow-hidden relative">
         <Link to="/" className="!opacity-100">
           <img
-            src={image}
+            src={image[0]}
             alt={name}
             className="w-full  h-fit md:h-[250px] object-cover group-hover:scale-125 transition-a"
           />

@@ -8,7 +8,7 @@ const Admin = () => {
   const [properties , setProperties ] = useState([])
 
   async function getData(){
-    let data = await fetch("http://localhost:4000/get-properties");
+    let data = await fetch("https://xbfakjw2ee.execute-api.ap-south-1.amazonaws.com/dev/get-properties");
     data = await data.json();
     console.log(data);
     

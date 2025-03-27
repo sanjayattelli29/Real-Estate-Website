@@ -1,7 +1,22 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { projects } from "../../../data/dummyData";
 
 const Projects = () => {
+  const [projects , setProperties ] = useState([])
+  
+    async function getData(){
+      let data = await fetch("https://xbfakjw2ee.execute-api.ap-south-1.amazonaws.com/dev/get-properties");
+      data = await data.json();
+      console.log(data);
+      
+      setProperties(data.data)
+    }
+  
+    useEffect(()=>{
+      getData();
+    },[])
+
+
   return (
     <div className="pt-10 pb-16">
       <div className="text-center">
@@ -14,7 +29,7 @@ const Projects = () => {
             <div className="overflow-hidden">
               <Link className="!opacity-100">
                 <img
-                  src={image}
+                  src={image[0]}
                   alt={name}
                   className="w-full  h-fit md:h-[250px] object-cover group-hover:scale-125 transition-a"
                 />
