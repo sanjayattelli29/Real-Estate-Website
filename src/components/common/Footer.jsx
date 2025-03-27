@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import { BiBuildingHouse } from "react-icons/bi";
-import { FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { FaInstagram, FaLinkedin, FaTwitter, FaWhatsapp } from "react-icons/fa";
 import { FiFacebook } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
@@ -13,7 +13,7 @@ const Footer = () => {
           <div className="flex-1 basis-[10rem]">
             <Link to="/" className="flex-shrink-0 flex-align-center gap-x-1">
               <BiBuildingHouse className="text-3xl text-primary" />
-              <h1 className="hidden md:block">MartVilla</h1>
+              <h1 className="hidden md:block">Your Company Name</h1>
             </Link>
             <div className="mt-3">
               <p className="text-sm">
@@ -34,7 +34,7 @@ const Footer = () => {
                 </div>
 
                 <div className="icon-box bg-dark-light hover:bg-hover-color-dark">
-                  <FaLinkedin />
+                  <FaWhatsapp />
                 </div>
               </div>
             </div>
@@ -44,19 +44,19 @@ const Footer = () => {
             <h2 className="text-xl font-semibold">Services</h2>
             <ul>
               <li className="my-3 text-muted">
-                <a href="#"> Order Tracking</a>
+                <a href="#"> Service - 1</a>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Whislist</a>
+                <a href="#">Service - 2</a>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Terms of use</a>
+                <a href="#">Service - 3</a>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Contact support</a>
+                <a href="#">Service - 4</a>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">2 year guarantee</a>
+                <a href="#">Service - 5</a>
               </li>
             </ul>
           </div>
@@ -71,10 +71,13 @@ const Footer = () => {
                 <a href="#">Services</a>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Blog</a>
+                <a href="#">Property</a>
               </li>
               <li className="my-3 text-muted">
                 <a href="#">Portifolio</a>
+              </li>
+              <li className="my-3 text-muted">
+                <a href="#">Admin login</a>
               </li>
             </ul>
           </div>
@@ -101,6 +104,21 @@ const Footer = () => {
           </div>
 
           <div className="flex-1 basis-[10rem] text-center md:text-left">
+            <h2 className="text-xl font-semibold">
+              Contact us
+            </h2>
+
+            <ul>
+              <li className="my-3 text-muted">
+                <a href="#"> Ph:- 0123456789</a>
+              </li>
+              <li className="my-3 text-muted">
+                <a href="#">email :- sales@company.com</a>
+              </li>
+            </ul>
+
+
+
             <h2 className="text-xl font-semibold">
               Subscribe to our Newsletter
             </h2>
