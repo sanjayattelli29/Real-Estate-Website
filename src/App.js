@@ -32,6 +32,7 @@ import {
 import { closeDropdown } from "./features/uiSlice";
 import Dropdown from "./components/common/DropDown";
 import NewsLetter from "./components/common/NewsLetter";
+import Admin from "./pages/Admin";
 function App() {
   const [showButton, setShowButton] = useState(false);
   const dispatch = useDispatch();
@@ -62,28 +63,30 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/home-2" element={<HomeTwo />} />
-          <Route path="/home-3" element={<HomeThree />} />
+          {/* <Route path="/home-3" element={<HomeThree />} /> */}
           <Route path="/about-us" element={<About />} />
           <Route path="/about-2" element={<AboutTwo />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services-2" element={<ServicesTwo />} />
           <Route path="/property" element={<Property />} />
-          <Route path="/property-2" element={<PropertyTwo />} />
-          <Route path="/property-3" element={<PropertyThree />} />
-          <Route path="/property-4" element={<PropertyFour />} />
+          {/* <Route path="/property-2" element={<PropertyTwo />} /> */}
+          <Route path="/property-2" element={<PropertyThree />} />
+          {/* <Route path="/property-4" element={<PropertyFour />} />
           <Route path="/property-5" element={<PropertyFive />} />
-          <Route path="/property-6" element={<PropertySix />} />
-          <Route path="/blog" element={<Blog />} />
+          <Route path="/property-6" element={<PropertySix />} /> */}
+          {/* <Route path="/blog" element={<Blog />} />
           <Route path="/blog-2" element={<BlogTwo />} />
           <Route path="/blog-3" element={<BlogThree />} />
-          <Route path="/blog-4" element={<BlogFour />} />
+          <Route path="/blog-4" element={<BlogFour />} /> */}
           <Route path="/contact" element={<Contact />} />
           <Route path="/portifolio" element={<Portifolio />} />
-          <Route path="/portifolio-2" element={<PortifolioTwo />} />
+          {/* <Route path="/portifolio-2" element={<PortifolioTwo />} /> */}
           <Route path="/team" element={<Team />} />
           <Route path="/faqs" element={<Faqs />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<PageNotFound />} />
+
         </Routes>
       </div>
       <div className="px-[2%] md:px-[6%] bg-card-dark border border-card-dark">

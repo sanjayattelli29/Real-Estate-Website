@@ -58,7 +58,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 flex-center-between">
         <Link to="/" className="flex-shrink-0 flex-align-center gap-x-1">
           <BiBuildingHouse className="text-3xl text-primary" />
-          <h1 className="hidden md:block">MartVilla</h1>
+          <h1 className="hidden md:block"> Your Company Name</h1>
         </Link>
 
         <div className="flex-align-center gap-x-4">
