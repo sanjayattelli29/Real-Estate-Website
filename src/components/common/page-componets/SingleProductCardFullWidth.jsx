@@ -23,7 +23,7 @@ const SingleProductCardFullWidth = ({
         <div className="group !opacity-100 overflow-hidden relative h-full">
           <Link to="/" className="!opacity-100">
             <img
-              src={image}
+              src={image[0]}
               alt={name}
               className="object-cover w-full h-full group-hover:scale-125 transition-a"
             />

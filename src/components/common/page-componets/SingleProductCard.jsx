@@ -17,7 +17,7 @@ const SingleProductCard = ({
 }) => {
   return (
     <div
-      className={`flex-1 ${
+      className={`flex-1 max-w-[430px] ${
         basis ? basis : "basis-[18rem]"
       } shadow-light dark:border-card-dark border rounded-lg overflow-hidden relative group`}
     >
