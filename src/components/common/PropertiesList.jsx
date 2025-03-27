@@ -14,7 +14,7 @@ const PropertyList = ({ property }) => {
   );
 
   async function deleteProperty( id ){
-    let response = await fetch("http://localhost:4000/delete-property" ,{
+    let response = await fetch("https://xbfakjw2ee.execute-api.ap-south-1.amazonaws.com/dev/delete-property" ,{
       method:"DELETE",
       headers:{ "Content-Type":"application/json"},
       body:JSON.stringify( {id:id} )

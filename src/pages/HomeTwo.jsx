@@ -19,7 +19,7 @@ const HomeTwo = () => {
       <LatestForSale />
       <Search />
       <Testimonial />
-      <Feeds />
+      {/* <Feeds /> */}
     </div>
   );
 };

@@ -11,7 +11,7 @@ export default function PropertyForm() {
     dimensions: " dimension of plot (3000 sq ft)",
     description:
       "Some description about your venture...",
-    image: ["img1.jpg", "img2.jpg", "img3.jpg"],
+    image: [ ],
     more_details: [],
   });
 
@@ -43,12 +43,62 @@ export default function PropertyForm() {
     setFormData({ ...formData, more_details: updatedDetails });
   };
 
+  async function addImage(e) 
+  {
+      e.preventDefault();
+      
+      const file = e.target.files[0]; // Get file from event
+      if (!file) 
+      {
+          alert("Please select an image.");
+          return;
+      }
+  
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "realestate"); // Replace with your actual Cloudinary preset
+  
+      try 
+      {
+          const response = await fetch("https://api.cloudinary.com/v1_1/dxvjbmgta/image/upload", {
+              method: "POST",
+              body: formData
+          });
+  
+          const data = await response.json();
+  
+          if (data.secure_url) 
+          {
+              console.log("Uploaded Image URL:", data.secure_url);
+              alert("Image uploaded successfully!");
+  
+              // Correctly update state
+              setFormData((prevData) => ({
+                  ...prevData, 
+                  image: [...prevData.image, data.secure_url] // Append new image
+              }));
+          } 
+          else 
+          {
+              console.error("Upload failed:", data);
+              alert("Image upload failed. Please try again.");
+          }
+      } 
+      catch (error) 
+      {
+          console.error("Error uploading image:", error);
+          alert("An error occurred while uploading.");
+      }
+  }
+  
+
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form Data Submitted:", formData);
 
-    let response = await fetch("http://localhost:4000/add-property" , {
+    let response = await fetch("https://xbfakjw2ee.execute-api.ap-south-1.amazonaws.com/dev/add-property" , {
       headers:{"Content-Type":"application/json"},
       method:"POST",
       body:JSON.stringify( formData )
@@ -104,6 +154,19 @@ export default function PropertyForm() {
             placeholder="Description"
             className="w-full p-2 border rounded"
           />
+
+          <div>
+              {formData.image.map((image, index) => (
+                  <img key={index} src={image} alt={`Uploaded ${index}`} className="w-32 h-32 object-cover rounded-md" />
+              ))}
+              <input 
+                  type="file"
+                  accept="image/*"
+                  onChange={addImage} // No need for (e) => addImage(e)
+                  className="mt-2"
+              />
+          </div>
+
 
           {/* More Details Section */}
           <div className="mt-4">

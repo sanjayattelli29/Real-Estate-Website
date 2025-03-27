@@ -2,8 +2,25 @@ import { BiBed, BiMap, BiMapAlt, BiTab } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import { property } from "../../../data/dummyData";
 import CardHoverIcons from "../../common/page-componets/CardHoverIcons";
+import { useEffect, useState } from "react";
 
 const LatestForSale = () => {
+
+  const [properties , setProperties ] = useState([])
+
+  async function getData(){
+    let data = await fetch("https://xbfakjw2ee.execute-api.ap-south-1.amazonaws.com/dev/get-properties");
+    data = await data.json();
+    console.log(data);
+    
+    setProperties(data.data)
+  }
+
+  useEffect(()=>{
+    getData();
+  },[])
+
+
   return (
     <div className="pt-10 pb-16">
       <div className="text-center">
@@ -11,7 +28,7 @@ const LatestForSale = () => {
         <h1 className="heading">featured property for sale</h1>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {property
+        {properties
           .slice(0, 6)
           ?.map(
             ({
@@ -30,7 +47,7 @@ const LatestForSale = () => {
                   <div className="group !opacity-100 overflow-hidden relative h-full">
                     <Link to="/" className="!opacity-100">
                       <img
-                        src={image}
+                        src={image[0]}
                         alt={name}
                         className="object-cover w-full h-full group-hover:scale-125 transition-a"
                       />
