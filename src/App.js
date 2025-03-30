@@ -33,6 +33,7 @@ import { closeDropdown } from "./features/uiSlice";
 import Dropdown from "./components/common/DropDown";
 import NewsLetter from "./components/common/NewsLetter";
 import Admin from "./pages/Admin";
+import DetailedPage from "./pages/DetailedPage";
 function App() {
   const [showButton, setShowButton] = useState(false);
   const dispatch = useDispatch();
@@ -85,6 +86,7 @@ function App() {
           <Route path="/faqs" element={<Faqs />} />
           <Route path="/home" element={<Home />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/venture" element={<DetailedPage />} />
           <Route path="*" element={<PageNotFound />} />
 
         </Routes>
