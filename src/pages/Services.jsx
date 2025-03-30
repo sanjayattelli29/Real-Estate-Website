@@ -12,8 +12,8 @@ const Services = () => {
       <ServicesList />
       <Categories />
       <Counter />
-      <Team />
-      <Feeds />
+      {/* <Team /> */}
+      {/* <Feeds /> */}
     </div>
   );
 };

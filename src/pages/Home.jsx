@@ -19,13 +19,15 @@ const Home = () => {
     <div className="pt-16 max-w-7xl mx-auto px-4">
       <Hero />
       <Filters />
-      <Invest />
+      {/* <Invest /> */}
+      <Featured />
+      
       <Speciality />
       <Services />
-      <Featured />
+      
       <Counter />
       {/* <Projects /> */}
-      <Testimonial />
+      {/* <Testimonial /> */}
       <Brands />
       {/* <Feeds /> */}
     </div>
