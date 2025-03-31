@@ -19,8 +19,10 @@ import {
 
 function DetailedPage() {
   return (
-    <div  className="pt-20 max-w-7xl mx-auto px-4" >
+    <div className="min-h-screen bg-gray-50">
+      <div className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <PropertyDetailPage />
+      </div>
     </div>
   )
 }
@@ -55,69 +57,33 @@ const PropertyDetailPage = () => {
   
     if (loading) {
       return (
-        <div className="loading-container" style={{ 
-          display: "flex", 
-          justifyContent: "center", 
-          alignItems: "center", 
-          minHeight: "100vh" 
-        }}>
-          <div style={{ textAlign: "center" }}>
-            <div className="spinner" style={{ 
-              border: "4px solid rgba(0, 0, 0, 0.1)", 
-              borderLeft: "4px solid #ff6b00", 
-              borderRadius: "50%", 
-              width: "40px", 
-              height: "40px", 
-              animation: "spin 1s linear infinite",
-              margin: "0 auto 20px"
-            }}></div>
-            <p>Loading property details...</p>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading property details...</p>
           </div>
-          <style jsx>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
         </div>
       );
     }
   
-    // Only render when data is available and loading is complete
     return (
-      <div className="property-detail-page">
-        {/* Hero Section */}
+      <div className="space-y-8">
         <Hero venture={venture} />
-  
-        {/* Main Content */}
-        <div
-          className="main-content"
-          style={{
-            padding: "3rem 0",
-          }}
-        >
-          <div
-            className="container"
-            style={{
-              maxWidth: "1200px",
-              margin: "0 auto"
-            }}
-          >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
             <Overview venture={venture} />
-            
             {venture.features && <Amenities features={venture.features} />}
-            
             {venture.layouts && <Layouts layouts={venture.layouts} />}
-           
             {venture.image && <ImageSection image={venture.image} />}
-
             {venture.video && <YoutubeEmbedVideo video2={venture.video} />}
-  
-            <CTA />
-  
             {venture.location_map && <GoogleMap location_map={venture.location_map} />}
-  
             {venture.legal_compliance && <LegalCompilance legal_compliance={venture.legal_compliance} />}
+            {venture.more_details && <MoreDetails more_details={venture.more_details} />}
+          </div>
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <CTA />
+            </div>
           </div>
         </div>
       </div>
@@ -125,115 +91,103 @@ const PropertyDetailPage = () => {
   };
 
 
-function Hero( { venture } )
+function Hero({ venture })
 {
     return <div
-    className="hero-section"
+    className="relative h-[60vh] min-h-[400px] rounded-xl overflow-hidden"
         style={{
-        backgroundImage:` linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(https://img.freepik.com/free-photo/observation-urban-building-business-steel_1127-2397.jpg)`,
+        backgroundImage:` linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${venture.banner_image})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        height: "500px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-        padding: "2rem",
         }}
   >
-    <div className="container">
-      <h1
-        style={{ color: "white", fontSize: "2.5rem", marginBottom: "1rem" }}
-      >
-        { venture.name }
-      </h1>
-      <div
-        className="location"
-        style={{
-          color: "white",
-          display: "flex",
-          alignItems: "center",
-          marginBottom: "1rem",
-        }}
-      >
-        <FaMapMarkerAlt style={{ marginRight: "0.5rem" }} />
-        { venture.location }
-      </div>
-      <div
-        className="hero-specs"
-        style={{
-          display: "flex",
-          color: "white",
-          marginBottom: "2rem",
-        }}
-      >
-        <div
-          style={{
-            marginRight: "2rem",
-            display: "flex",
-            alignItems: "center",
-          }}
+    <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 text-white">
+      <div className="max-w-4xl">
+        <h1
+          style={{ color: "white", fontSize: "2.5rem", marginBottom: "1rem" }}
         >
-          <FaRulerCombined style={{ marginRight: "0.5rem" }} />
-          { venture.dimensions}
-        </div>
+          { venture.name }
+        </h1>
         <div
+          className="location"
           style={{
-            marginRight: "2rem",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <FaBed style={{ marginRight: "0.5rem" }} />
-          { venture.number_of_beds} Bedrooms
-        </div>
-        <div
-          style={{
-            marginRight: "2rem",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <FaBath style={{ marginRight: "0.5rem" }} />
-          { venture.number_of_bathrooms} Bathrooms
-        </div>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <FaParking style={{ marginRight: "0.5rem" }} />
-          { venture.parking_space } Parking Spaces
-        </div>
-      </div>
-      <div className="hero-cta">
-        <button
-          style={{
-            backgroundColor: "#ff6b00",
             color: "white",
-            border: "none",
-            padding: "0.75rem 1.5rem",
-            borderRadius: "4px",
-            fontSize: "1rem",
-            fontWeight: "bold",
-            cursor: "pointer",
-            marginRight: "1rem",
+            display: "flex",
+            alignItems: "center",
+            marginBottom: "1rem",
           }}
         >
-          <FaCalendarAlt style={{ marginRight: "0.5rem" }} />
-          Schedule a Visit
-        </button>
-        <button
+          <FaMapMarkerAlt style={{ marginRight: "0.5rem" }} />
+          { venture.distance }
+        </div>
+        <div
+          className="hero-specs"
           style={{
-            backgroundColor: "transparent",
+            display: "flex",
             color: "white",
-            border: "2px solid white",
-            padding: "0.75rem 1.5rem",
-            borderRadius: "4px",
-            fontSize: "1rem",
-            fontWeight: "bold",
-            cursor: "pointer",
+            marginBottom: "2rem",
           }}
-          onClick={()=>window.open( venture.brochure , "_blank" )}
         >
-          <FaDownload style={{ marginRight: "0.5rem" }} />
-          Download Brochure
-        </button>
+           
+          <div
+            style={{
+              marginRight: "2rem",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <FaBed style={{ marginRight: "0.5rem" }} />
+            { venture.number_of_beds} Bedrooms
+          </div>
+          <div
+            style={{
+              marginRight: "2rem",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <FaBath style={{ marginRight: "0.5rem" }} />
+            { venture.number_of_bathrooms} Bathrooms
+          </div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <FaParking style={{ marginRight: "0.5rem" }} />
+            { venture.parking_space } Parking Spaces
+          </div>
+        </div>
+        <div className="hero-cta">
+          <button
+            style={{
+              backgroundColor: "#ff6b00",
+              color: "white",
+              border: "none",
+              padding: "0.75rem 1.5rem",
+              borderRadius: "4px",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              cursor: "pointer",
+              marginRight: "1rem",
+            }}
+          >
+            <FaCalendarAlt style={{ marginRight: "0.5rem" }} />
+            Schedule a Visit
+          </button>
+          <button
+            style={{
+              backgroundColor: "transparent",
+              color: "white",
+              border: "2px solid white",
+              padding: "0.75rem 1.5rem",
+              borderRadius: "4px",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+            onClick={()=>window.open( venture.brochure , "_blank" )}
+          >
+            <FaDownload style={{ marginRight: "0.5rem" }} />
+            Download Brochure
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -242,131 +196,38 @@ function Hero( { venture } )
 function Overview( { venture } )
 {
     return <div
-    className="overview-section"
-    style={{
-      padding: "2rem",
-      borderRadius: "8px",
-      marginBottom: "2rem",
-    }}
+    className="bg-white rounded-xl p-6 shadow-sm"
   >
-    <div
+    <h2
       style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
+        color: "#333",
+        fontSize: "1.8rem",
+        marginBottom: "1.5rem",
+        position: "relative",
+        paddingBottom: "0.5rem",
       }}
     >
-      <div style={{ flexBasis: "65%" }}>
-        <h2
-          style={{
-            color: "#333",
-            fontSize: "1.8rem",
-            marginBottom: "1.5rem",
-            position: "relative",
-            paddingBottom: "0.5rem",
-          }}
-        >
-          Project Overview
-          <span
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              width: "80px",
-              height: "3px",
-              backgroundColor: "#ff6b00",
-            }}
-          ></span>
-        </h2>
-        <p
-          style={{
-            color: "#666",
-            lineHeight: 1.6,
-            marginBottom: "1.5rem",
-          }}
-        >
-          { venture.description }
-        </p>
-      </div>
-
-      <div
+      Project Overview
+      <span
         style={{
-          flexBasis: "30%",
-          backgroundColor: "#f8f8f8",
-          padding: "1.5rem",
-          borderRadius: "8px",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          width: "80px",
+          height: "3px",
+          backgroundColor: "#ff6b00",
         }}
-      >
-        <h3
-          style={{
-            color: "#333",
-            fontSize: "1.3rem",
-            marginBottom: "1rem",
-            textAlign: "center",
-          }}
-        >
-          Interested in this property?
-        </h3>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Your Name"
-            style={{
-              padding: "0.75rem",
-              borderRadius: "4px",
-              border: "1px solid #ddd",
-              width: "100%",
-            }}
-          />
-          <input
-            type="email"
-            placeholder="Your Email"
-            style={{
-              padding: "0.75rem",
-              borderRadius: "4px",
-              border: "1px solid #ddd",
-              width: "100%",
-            }}
-          />
-          <input
-            type="tel"
-            placeholder="Your Phone"
-            style={{
-              padding: "0.75rem",
-              borderRadius: "4px",
-              border: "1px solid #ddd",
-              width: "100%",
-            }}
-          />
-          <button
-            style={{
-              backgroundColor: "#ff6b00",
-              color: "white",
-              border: "none",
-              padding: "0.75rem",
-              borderRadius: "4px",
-              fontSize: "1rem",
-              fontWeight: "bold",
-              cursor: "pointer",
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <FaPhone style={{ marginRight: "0.5rem" }} />
-            Request Price Quote
-          </button>
-        </div>
-      </div>
-    </div>
+      ></span>
+    </h2>
+    <p
+      style={{
+        color: "#666",
+        lineHeight: 1.6,
+        marginBottom: "1.5rem",
+      }}
+    >
+      { venture.description }
+    </p>
   </div>
 }
 
@@ -385,12 +246,7 @@ function Amenities({ features })
 
     return (
         <div
-            className="amenities-section"
-            style={{
-                padding: "2rem",
-                borderRadius: "8px",
-                marginBottom: "2rem",
-            }}
+            className="bg-white rounded-xl p-6 shadow-sm"
         >
             <h2
                 style={{
@@ -459,186 +315,160 @@ function Amenities({ features })
     );
 }
 
-function Layouts( { layouts }  )
-{
-    return <div
-    className="floor-plans-section"
-    style={{
-      backgroundColor: "white",
-      padding: "2rem",
-      borderRadius: "8px",
-      marginBottom: "2rem",
-    }}
-  >
-    <h2
-      style={{
-        color: "#333",
-        fontSize: "1.8rem",
-        marginBottom: "1.5rem",
-        position: "relative",
-        paddingBottom: "0.5rem",
-      }}
-    >
-      Floor Plans & Layouts
-      <span
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: "80px",
-          height: "3px",
-          backgroundColor: "#ff6b00",
-        }}
-      ></span>
-    </h2>
-
-    <div style={{ marginBottom: "1.5rem" }}>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          backgroundColor: "#f8f8f8",
-          padding: "2rem",
-          borderRadius: "8px",
-        }}
-      >
-         {
-            layouts?.map( layout => <div>
-                <img 
-                src={layout.img}
-                />
-                <label>{layout.name}</label>
-            </div> )
-          }
-      </div>
-    </div>
-  </div>
-}
-
-
-function ImageSection({ image }) {
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-
+function Layouts({ layouts }) {
   return (
-    <div
-      className="gallery-section"
-      style={{
-        backgroundColor: "white",
-        padding: "2rem",
-        borderRadius: "8px",
-        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-        marginBottom: "2rem",
-      }}
-    >
-      <h2
-        style={{
-          color: "#333",
-          fontSize: "1.8rem",
-          marginBottom: "1.5rem",
-          position: "relative",
-          paddingBottom: "0.5rem",
-        }}
-      >
-        Image & Video Gallery
-        <span
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "80px",
-            height: "3px",
-            backgroundColor: "#ff6b00",
-          }}
-        ></span>
+    <div className="bg-white rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+        Floor Plans & Layouts
+        <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
       </h2>
 
-      <div style={{ marginBottom: "1rem" }}>
-        <img
-          src={image[activeImageIndex]}
-          alt={`Gallery image ${activeImageIndex + 1}`}
-          style={{
-            width: "100%",
-            height: "auto",
-            borderRadius: "8px",
-            objectFit: "cover"
-          }}
-        />
-      </div>
-
-      <div className='flex'>
-        {
-          image?.map((img, index) => (
-            <img
-              key={index}
-              src={img}
-              alt={`Thumbnail ${index + 1}`}
-              onClick={() => setActiveImageIndex(index)}
-              className='w-40 p-1 bg-blue-200 m-2 rounded-md cursor-pointer'
-              style={{
-                border: activeImageIndex === index ? '2px solid #ff6b00' : 'none'
-              }}
-            />
-          ))
-        }
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {layouts?.map((layout, index) => (
+          <div 
+            key={index}
+            className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+          >
+            <div className="relative h-48">
+              <img 
+                src={layout.img}
+                alt={layout.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold text-gray-800">{layout.name}</h3>
+              <button className="mt-2 text-orange-500 hover:text-orange-600 font-medium flex items-center">
+                View Details
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
 
-function YoutubeEmbedVideo({ video2 }) {
-    return  <div
-                className="gallery-section"
-                style={{
-                backgroundColor: "white",
-                padding: "2rem",
-                borderRadius: "8px",
-                marginBottom: "2rem",
-                }}
-            >
-                <h2
-                style={{
-                    color: "#333",
-                    fontSize: "1.8rem",
-                    marginBottom: "1.5rem",
-                    position: "relative",
-                    paddingBottom: "0.5rem",
-                }}
-                >
-                Image & Video Gallery
-                <span
-                    style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "80px",
-                    height: "3px",
-                    backgroundColor: "#ff6b00",
-                    }}
-                ></span>
-                </h2>
+function ImageSection({ image }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-                {
-           <div
-           dangerouslySetInnerHTML={{ __html: video2 }}
-         ></div>
-          }
-                </div>
-  }
+  const nextImage = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % image.length);
+  };
+
+  const previousImage = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + image.length) % image.length);
+  };
+
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+        Image Gallery
+        <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
+      </h2>
+
+      <div className="relative">
+        {/* Main Image Container with Fixed Height */}
+        <div className="relative h-[500px] rounded-lg overflow-hidden mb-4">
+          <img
+            src={image[currentIndex]}
+            alt={`Image ${currentIndex + 1}`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="absolute bottom-4 right-4 flex space-x-2">
+          <button
+            onClick={previousImage}
+            className="bg-white/90 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md"
+            aria-label="Previous image"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={nextImage}
+            className="bg-white/90 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md"
+            aria-label="Next image"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Image Counter */}
+        <div className="absolute bottom-4 left-4 bg-white/90 px-3 py-1 rounded-full text-sm font-medium shadow-md">
+          {currentIndex + 1} / {image.length}
+        </div>
+
+        {/* Thumbnails */}
+        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-4">
+          {image.map((img, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`relative h-20 rounded-md overflow-hidden ${
+                currentIndex === index ? 'ring-2 ring-orange-500' : ''
+              }`}
+            >
+              <img
+                src={img}
+                alt={`Thumbnail ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+function YoutubeEmbedVideo({ video2 }) {
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+        Video Gallery
+        <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
+      </h2>
+
+      <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+        <div 
+          className="absolute top-0 left-0 w-full h-full"
+          dangerouslySetInnerHTML={{ 
+            __html: video2.replace(
+              /width="\d+"/, 
+              'width="100%"'
+            ).replace(
+              /height="\d+"/, 
+              'height="100%"'
+            ).replace(
+              /style="[^"]*"/, 
+              'style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"'
+            )
+          }} 
+        />
+      </div>
+    </div>
+  );
+}
 
 function CTA()
 {
     return <div
-    className="cta-section"
-    style={{
-      backgroundColor: "#ff6b00",
-      padding: "3rem 2rem",
-      borderRadius: "8px",
-      textAlign: "center",
-      color: "white",
-    }}
-  >
+    className="bg-orange-500 rounded-xl p-6 text-white"
+    >
     <h2
       style={{
         fontSize: "2rem",
@@ -705,74 +535,39 @@ function CTA()
 }
 
 
-function GoogleMap( { location_map }  )
-{
-    return   <div
-    className="location-section"
-    style={{
-      backgroundColor: "white",
-      padding: "2rem",
-      borderRadius: "8px",
-      marginBottom: "2rem",
-    }}
-  >
-    <h2
-      style={{
-        color: "#333",
-        fontSize: "1.8rem",
-        marginBottom: "1.5rem",
-        position: "relative",
-        paddingBottom: "0.5rem",
-      }}
-    >
-      Location & Map
-      <span
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: "80px",
-          height: "3px",
-          backgroundColor: "#ff6b00",
-        }}
-      ></span>
-    </h2>
+function GoogleMap({ location_map }) {
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+        Location & Map
+        <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
+      </h2>
 
-    <div style={{ display: "flex", gap: "2rem" }}>
-      <div style={{ flex: 1 }}>
-        <div
-          style={{
-            borderRadius: "8px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "#888",
-            fontSize: "1.2rem",
-            fontStyle: "italic",
-          }}
-        >
-          {
-           <div
-           dangerouslySetInnerHTML={{ __html: location_map }}
-         ></div>
-          }
-        </div>
+      <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+        <div 
+          className="absolute top-0 left-0 w-full h-full rounded-lg overflow-hidden"
+          dangerouslySetInnerHTML={{ 
+            __html: location_map.replace(
+              /width="\d+"/, 
+              'width="100%"'
+            ).replace(
+              /height="\d+"/, 
+              'height="100%"'
+            ).replace(
+              /style="[^"]*"/, 
+              'style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"'
+            )
+          }} 
+        />
       </div>
-
     </div>
-  </div>
+  );
 }
 
 function LegalCompilance( { legal_compliance }  )
 {
     return  <div
-    className="legal-section"
-    style={{
-      backgroundColor: "white",
-      padding: "2rem",
-      borderRadius: "8px",
-      marginBottom: "2rem",
-    }}
+    className="bg-white rounded-xl p-6 shadow-sm"
   >
     <h2
       style={{
@@ -860,4 +655,27 @@ function LegalCompilance( { legal_compliance }  )
       </p>
     </div>
   </div>
+}
+
+function MoreDetails({ more_details }) {
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+        Additional Details
+        <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {more_details.map((detail, index) => (
+          <div 
+            key={index}
+            className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow"
+          >
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{detail.key}</h3>
+            <p className="text-gray-600">{detail.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

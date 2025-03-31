@@ -34,6 +34,7 @@ import Dropdown from "./components/common/DropDown";
 import NewsLetter from "./components/common/NewsLetter";
 import Admin from "./pages/Admin";
 import DetailedPage from "./pages/DetailedPage";
+import Admin2 from "./pages/Admin2";
 function App() {
   const [showButton, setShowButton] = useState(false);
   const dispatch = useDispatch();
@@ -85,7 +86,8 @@ function App() {
           <Route path="/team" element={<Team />} />
           <Route path="/faqs" element={<Faqs />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<Admin2 />} />
+          <Route path="/admin-2" element={<Admin />} />
           <Route path="/venture" element={<DetailedPage />} />
           <Route path="*" element={<PageNotFound />} />
 

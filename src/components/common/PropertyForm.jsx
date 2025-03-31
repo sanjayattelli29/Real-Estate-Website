@@ -13,6 +13,7 @@ export default function PropertyForm() {
       "Some description about your venture...",
     image: [ ],
     more_details: [],
+    brochure:""
   });
 
   // Handle general input changes
@@ -120,7 +121,7 @@ export default function PropertyForm() {
         <h2 className="text-2xl font-bold text-gray-700 mb-4">Add Property Details</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Standard Input Fields */}
-          {["name", "location", "price", "distance", "purpose", "contact", "dimensions"].map((field) => (
+          {["name", "location", "price", "distance", "purpose", "contact", "dimensions","brochure"].map((field) => (
             <input
               key={field}
               type="text"
