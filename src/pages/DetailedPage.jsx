@@ -19,8 +19,8 @@ import {
 
 function DetailedPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="pt-16">
         <PropertyDetailPage />
       </div>
     </div>
@@ -36,16 +36,38 @@ export default DetailedPage;
 const PropertyDetailPage = () => {
     const [venture, setVenture] = useState({});
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
   
     async function getData() {
       setLoading(true);
+      setError(null);
       try {
         const params = new URLSearchParams(window.location.search);
-        let data = await fetch(`https://xbfakjw2ee.execute-api.ap-south-1.amazonaws.com/dev/get-properties?id=${params.get("id")}`);
-        data = await data.json();
+        const id = params.get("id");
+        
+        console.log("Fetching data for ID:", id);
+        
+        if (!id) {
+          setError("No property ID provided");
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(`https://xbfakjw2ee.execute-api.ap-south-1.amazonaws.com/dev/get-properties?id=${id}`);
+        const data = await response.json();
+        
+        console.log("API Response:", data);
+        
+        if (!data.success || !data.data) {
+          setError("Failed to fetch property data");
+          setLoading(false);
+          return;
+        }
+
         setVenture(data.data);
       } catch (error) {
         console.error("Error fetching property data:", error);
+        setError("An error occurred while fetching property data");
       } finally {
         setLoading(false);
       }
@@ -54,35 +76,70 @@ const PropertyDetailPage = () => {
     useEffect(() => {
       getData();
     }, []);
+
+    if (error) {
+      return (
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center p-8 bg-white rounded-lg shadow-md">
+            <div className="text-red-500 text-2xl mb-4">Error</div>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      );
+    }
   
     if (loading) {
       return (
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
+          <div className="text-center p-8 bg-white rounded-lg shadow-md">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading property details...</p>
           </div>
         </div>
       );
     }
+
+    if (!venture || Object.keys(venture).length === 0) {
+      return (
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center p-8 bg-white rounded-lg shadow-md">
+            <p className="text-gray-600 mb-4">No property data available</p>
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      );
+    }
   
     return (
-      <div className="space-y-8">
+      <div className="space-y-4">
         <Hero venture={venture} />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <Overview venture={venture} />
-            {venture.features && <Amenities features={venture.features} />}
-            {venture.layouts && <Layouts layouts={venture.layouts} />}
-            {venture.image && <ImageSection image={venture.image} />}
-            {venture.video && <YoutubeEmbedVideo video2={venture.video} />}
-            {venture.location_map && <GoogleMap location_map={venture.location_map} />}
-            {venture.legal_compliance && <LegalCompilance legal_compliance={venture.legal_compliance} />}
-            {venture.more_details && <MoreDetails more_details={venture.more_details} />}
-          </div>
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <CTA />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Overview venture={venture} />
+              {venture.features && venture.features.length > 0 && <Amenities features={venture.features} />}
+              {venture.layouts && venture.layouts.length > 0 && <Layouts layouts={venture.layouts} />}
+              {venture.image && venture.image.length > 0 && <ImageSection image={venture.image} />}
+              {venture.video && <YoutubeEmbedVideo video2={venture.video} />}
+              {venture.location_map && <GoogleMap location_map={venture.location_map} />}
+              {venture.legal_compliance && venture.legal_compliance.length > 0 && <LegalCompilance legal_compliance={venture.legal_compliance} />}
+              {venture.more_details && venture.more_details.length > 0 && <MoreDetails more_details={venture.more_details} />}
+            </div>
+            <div className="lg:col-span-1">
+              <div className="sticky top-20">
+                <CTA />
+              </div>
             </div>
           </div>
         </div>
@@ -94,141 +151,72 @@ const PropertyDetailPage = () => {
 function Hero({ venture })
 {
     return <div
-    className="relative h-[60vh] min-h-[400px] rounded-xl overflow-hidden"
+    className="relative h-[90vh] min-h-[600px] w-full overflow-hidden"
         style={{
-        backgroundImage:` linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${venture.banner_image})`,
+        backgroundImage:` linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url( ${ venture.banner_image ? venture.banner_image : venture.image[0] })`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         }}
   >
     <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 text-white">
-      <div className="max-w-4xl">
-        <h1
-          style={{ color: "white", fontSize: "2.5rem", marginBottom: "1rem" }}
-        >
-          { venture.name }
-        </h1>
-        <div
-          className="location"
-          style={{
-            color: "white",
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "1rem",
-          }}
-        >
-          <FaMapMarkerAlt style={{ marginRight: "0.5rem" }} />
-          { venture.distance }
-        </div>
-        <div
-          className="hero-specs"
-          style={{
-            display: "flex",
-            color: "white",
-            marginBottom: "2rem",
-          }}
-        >
-           
-          <div
-            style={{
-              marginRight: "2rem",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <FaBed style={{ marginRight: "0.5rem" }} />
-            { venture.number_of_beds} Bedrooms
+      <div className="max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between">
+          <div className="flex-1">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+              { venture.name }
+            </h1>
+            <div className="flex items-center text-lg mb-4">
+              <FaMapMarkerAlt className="mr-2" />
+              { venture.distance }
+            </div>
+            <div className="flex flex-wrap gap-6 text-lg">
+              <div className="flex items-center">
+                <FaBed className="mr-2" />
+                { venture.number_of_beds} Bedrooms
+              </div>
+              <div className="flex items-center">
+                <FaBath className="mr-2" />
+                { venture.number_of_bathrooms} Bathrooms
+              </div>
+              <div className="flex items-center">
+                <FaParking className="mr-2" />
+                { venture.parking_space } Parking Spaces
+              </div>
+            </div>
           </div>
-          <div
-            style={{
-              marginRight: "2rem",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <FaBath style={{ marginRight: "0.5rem" }} />
-            { venture.number_of_bathrooms} Bathrooms
+          <div className="flex flex-col sm:flex-row gap-4 mt-6 md:mt-0">
+            <button
+              className="bg-orange-500 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transform hover:scale-105 transition-all flex items-center justify-center"
+            >
+              <FaCalendarAlt className="mr-2" />
+              Schedule a Visit
+            </button>
+            <button
+              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-white hover:text-orange-500 transform hover:scale-105 transition-all flex items-center justify-center"
+              onClick={()=>window.open( venture.brochure , "_blank" )}
+            >
+              <FaDownload className="mr-2" />
+              Download Brochure
+            </button>
           </div>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <FaParking style={{ marginRight: "0.5rem" }} />
-            { venture.parking_space } Parking Spaces
-          </div>
-        </div>
-        <div className="hero-cta">
-          <button
-            style={{
-              backgroundColor: "#ff6b00",
-              color: "white",
-              border: "none",
-              padding: "0.75rem 1.5rem",
-              borderRadius: "4px",
-              fontSize: "1rem",
-              fontWeight: "bold",
-              cursor: "pointer",
-              marginRight: "1rem",
-            }}
-          >
-            <FaCalendarAlt style={{ marginRight: "0.5rem" }} />
-            Schedule a Visit
-          </button>
-          <button
-            style={{
-              backgroundColor: "transparent",
-              color: "white",
-              border: "2px solid white",
-              padding: "0.75rem 1.5rem",
-              borderRadius: "4px",
-              fontSize: "1rem",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-            onClick={()=>window.open( venture.brochure , "_blank" )}
-          >
-            <FaDownload style={{ marginRight: "0.5rem" }} />
-            Download Brochure
-          </button>
         </div>
       </div>
     </div>
   </div>
 }
 
-function Overview( { venture } )
-{
-    return <div
-    className="bg-white rounded-xl p-6 shadow-sm"
-  >
-    <h2
-      style={{
-        color: "#333",
-        fontSize: "1.8rem",
-        marginBottom: "1.5rem",
-        position: "relative",
-        paddingBottom: "0.5rem",
-      }}
-    >
-      Project Overview
-      <span
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: "80px",
-          height: "3px",
-          backgroundColor: "#ff6b00",
-        }}
-      ></span>
-    </h2>
-    <p
-      style={{
-        color: "#666",
-        lineHeight: 1.6,
-        marginBottom: "1.5rem",
-      }}
-    >
-      { venture.description }
-    </p>
-  </div>
+function Overview({ venture }) {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-4 relative pb-2 text-gray-900 dark:text-white">
+        Project Overview
+        <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
+      </h2>
+      <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+        {venture.description}
+      </p>
+    </div>
+  );
 }
 
 
@@ -245,18 +233,8 @@ function Amenities({ features })
     };
 
     return (
-        <div
-            className="bg-white rounded-xl p-6 shadow-sm"
-        >
-            <h2
-                style={{
-                    color: "#333",
-                    fontSize: "1.8rem",
-                    marginBottom: "1.5rem",
-                    position: "relative",
-                    paddingBottom: "0.5rem",
-                }}
-            >
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+            <h2 className="text-2xl font-bold mb-6 relative pb-2 text-gray-900 dark:text-white">
                 Amenities & Features
                 <span
                     style={{
@@ -270,44 +248,16 @@ function Amenities({ features })
                 ></span>
             </h2>
 
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                    gap: "1.5rem",
-                }}
-            >
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {features?.map((feature, index) => (
                     <div
                         key={index}
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            textAlign: "center",
-                            padding: "1.5rem",
-                            backgroundColor: "#f8f8f8",
-                            borderRadius: "8px",
-                            transition: "transform 0.3s",
-                        }}
+                        className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
                     >
-                        <div
-                            style={{
-                                backgroundColor: "#ff6b00",
-                                color: "white",
-                                width: "50px",
-                                height: "50px",
-                                borderRadius: "50%",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                fontSize: "1.5rem",
-                                marginBottom: "1rem",
-                            }}
-                        >
+                        <div className="bg-orange-500 text-white p-2 rounded-lg">
                             {amenities[feature] || "?"}
                         </div>
-                        <h4 style={{ margin: 0 }}>{feature}</h4>
+                        <span className="font-medium text-gray-900 dark:text-white">{feature}</span>
                     </div>
                 ))}
             </div>
@@ -317,8 +267,8 @@ function Amenities({ features })
 
 function Layouts({ layouts }) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2 text-gray-900 dark:text-white">
         Floor Plans & Layouts
         <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
       </h2>
@@ -327,7 +277,7 @@ function Layouts({ layouts }) {
         {layouts?.map((layout, index) => (
           <div 
             key={index}
-            className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+            className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
           >
             <div className="relative h-48">
               <img 
@@ -337,8 +287,8 @@ function Layouts({ layouts }) {
               />
             </div>
             <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-800">{layout.name}</h3>
-              <button className="mt-2 text-orange-500 hover:text-orange-600 font-medium flex items-center">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{layout.name}</h3>
+              <button className="mt-2 text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 font-medium flex items-center">
                 View Details
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -365,15 +315,15 @@ function ImageSection({ image }) {
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2 text-gray-900 dark:text-white">
         Image Gallery
         <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
       </h2>
 
       <div className="relative">
         {/* Main Image Container with Fixed Height */}
-        <div className="relative h-[500px] rounded-lg overflow-hidden mb-4">
+        <div className="relative h-[600px] rounded-lg overflow-hidden mb-4">
           <img
             src={image[currentIndex]}
             alt={`Image ${currentIndex + 1}`}
@@ -385,7 +335,7 @@ function ImageSection({ image }) {
         <div className="absolute bottom-4 right-4 flex space-x-2">
           <button
             onClick={previousImage}
-            className="bg-white/90 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md"
+            className="bg-white/90 hover:bg-white text-gray-800 dark:bg-gray-800/90 dark:hover:bg-gray-800 dark:text-white w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md"
             aria-label="Previous image"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -394,7 +344,7 @@ function ImageSection({ image }) {
           </button>
           <button
             onClick={nextImage}
-            className="bg-white/90 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md"
+            className="bg-white/90 hover:bg-white text-gray-800 dark:bg-gray-800/90 dark:hover:bg-gray-800 dark:text-white w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md"
             aria-label="Next image"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -432,13 +382,10 @@ function ImageSection({ image }) {
 }
 
 
-
-
-
 function YoutubeEmbedVideo({ video2 }) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2 text-gray-900 dark:text-white">
         Video Gallery
         <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
       </h2>
@@ -537,8 +484,8 @@ function CTA()
 
 function GoogleMap({ location_map }) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2 text-gray-900 dark:text-white">
         Location & Map
         <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
       </h2>
@@ -567,7 +514,7 @@ function GoogleMap({ location_map }) {
 function LegalCompilance( { legal_compliance }  )
 {
     return  <div
-    className="bg-white rounded-xl p-6 shadow-sm"
+    className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm"
   >
     <h2
       style={{
@@ -659,8 +606,8 @@ function LegalCompilance( { legal_compliance }  )
 
 function MoreDetails({ more_details }) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 relative pb-2">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+      <h2 className="text-2xl font-bold mb-6 relative pb-2 text-gray-900 dark:text-white">
         Additional Details
         <span className="absolute bottom-0 left-0 w-20 h-1 bg-orange-500"></span>
       </h2>
@@ -669,10 +616,10 @@ function MoreDetails({ more_details }) {
         {more_details.map((detail, index) => (
           <div 
             key={index}
-            className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow"
+            className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
           >
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">{detail.key}</h3>
-            <p className="text-gray-600">{detail.value}</p>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{detail.key}</h3>
+            <p className="text-gray-600 dark:text-gray-300">{detail.value}</p>
           </div>
         ))}
       </div>

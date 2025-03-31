@@ -25,7 +25,7 @@ const Featured = () => {
         <h1 className="heading">explore featured latest properties</h1>
       </div>
       <div className="flex flex-wrap gap-4 mt-8">
-        {properties.slice(0, 3).map((featured) => (
+        {properties.map((featured) => (
           <SingleProductCard key={featured.id} {...featured} />
         ))}
       </div>
