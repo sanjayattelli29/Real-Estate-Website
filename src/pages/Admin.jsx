@@ -347,17 +347,6 @@ const PropertyForm = () => {
                 placeholder="Enter property description"
               ></textarea>
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">More Details</label>
-              <textarea
-                name="more_details"
-                value={property.more_details}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                rows="4"
-                placeholder="Enter additional details"
-              ></textarea>
-            </div>
           </div>
         </div>
 

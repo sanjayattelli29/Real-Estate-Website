@@ -4,6 +4,7 @@ import CardHoverIcons from "./CardHoverIcons";
 import CardLabels from "./CardLabels";
 
 const SingleProductCard = ({
+  _id,
   name,
   location,
   price,
@@ -22,7 +23,7 @@ const SingleProductCard = ({
       } shadow-light dark:border-card-dark border rounded-lg overflow-hidden relative group`}
     >
       <div className="group !opacity-100 overflow-hidden relative">
-        <Link to="/contact" className="!opacity-100">
+        <Link to={`/venture?id=${_id}`} className="!opacity-100">
           <img
             src={image[0]}
             alt={name}
@@ -64,8 +65,14 @@ const SingleProductCard = ({
         </div>
 
         <div className="mt-4 flex-center-between">
-          <h1 className="text-lg font-semibold text-primary">${price}</h1>
-          <button className="btn btn-secondary">details</button>
+          <h1 className="text-lg font-semibold text-primary">{price}</h1>
+          <button className="btn btn-secondary"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = `/contact#contact-form`;
+          }}
+          >details</button>
         </div>
       </div>
     </div>

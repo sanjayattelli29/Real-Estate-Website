@@ -16,12 +16,17 @@ const Contact = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <ContactInfo />
+          
+        </div>
+
+        <div className="m-12" id="contact-form">
           <Form />
         </div>
         
         <div className="mt-12">
           <Map />
         </div>
+
       </div>
     </div>
   );

@@ -32,6 +32,33 @@ const Admin2 = () => {
     password: ''
   });
 
+  // Check login status on component mount
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const lastLoginTime = localStorage.getItem('lastLoginTime');
+      const adminToken = localStorage.getItem('adminToken');
+      
+      if (!adminToken || !lastLoginTime) {
+        setShowLogin(true);
+        return;
+      }
+
+      const currentTime = new Date().getTime();
+      const timeDiff = currentTime - parseInt(lastLoginTime);
+      const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+
+      if (timeDiff > oneHour) {
+        // Clear all localStorage and logout
+        localStorage.clear();
+        setShowLogin(true);
+      } else {
+        setShowLogin(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
   // Fetch enquiries and properties data
   useEffect(() => {
     const fetchData = async () => {
@@ -140,21 +167,42 @@ const Admin2 = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    setShowLogin(true);
-  };
-
   const handleLogin = (e) => {
     e.preventDefault();
-    // Add your authentication logic here
     if (loginCredentials.username === 'admin' && loginCredentials.password === 'admin123') {
       localStorage.setItem('adminToken', 'dummy-token');
+      localStorage.setItem('lastLoginTime', new Date().getTime().toString());
       setShowLogin(false);
     } else {
       alert('Invalid credentials');
     }
   };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setShowLogin(true);
+  };
+
+  // Add auto-logout check every minute
+  useEffect(() => {
+    if (!showLogin) {
+      const interval = setInterval(() => {
+        const lastLoginTime = localStorage.getItem('lastLoginTime');
+        if (lastLoginTime) {
+          const currentTime = new Date().getTime();
+          const timeDiff = currentTime - parseInt(lastLoginTime);
+          const oneHour = 60 * 60 * 1000;
+
+          if (timeDiff > oneHour) {
+            localStorage.clear();
+            setShowLogin(true);
+          }
+        }
+      }, 60000); // Check every minute
+
+      return () => clearInterval(interval);
+    }
+  }, [showLogin]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
