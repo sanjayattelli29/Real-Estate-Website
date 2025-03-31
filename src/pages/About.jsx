@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { OverView, Stats } from "../components/about";
 import {
   AboutUs,
@@ -6,9 +7,13 @@ import {
   Team,
   Testimonial,
   WhatWeDo,
+  SideContactButton,
 } from "../components/common/page-componets";
+import ContactPopupForm from '../components/common/page-componets/ContactPopupForm';
 
 const About = () => {
+  const [isContactFormOpen, setIsContactFormOpen] = useState(false);
+
   return (
     <div className="pt-20 max-w-7xl mx-auto px-4">
       <Stats />
@@ -25,7 +30,11 @@ const About = () => {
       <WhatWeDo />
       {/* <Feeds /> */}
 
-
+      <SideContactButton onClick={() => setIsContactFormOpen(true)} />
+      <ContactPopupForm 
+        isOpen={isContactFormOpen} 
+        onClose={() => setIsContactFormOpen(false)} 
+      />
     </div>
   );
 };

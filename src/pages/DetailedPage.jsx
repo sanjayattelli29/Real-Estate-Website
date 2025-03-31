@@ -15,14 +15,23 @@ import {
   } from "react-icons/fa";
   import { SiClubhouse } from "react-icons/si";
   import { GiPowerGenerator } from "react-icons/gi";
+  import { SideContactButton } from '../components/common/page-componets';
+  import ContactPopupForm from '../components/common/page-componets/ContactPopupForm';
   
 
 function DetailedPage() {
+  const [isContactFormOpen, setIsContactFormOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="pt-16">
         <PropertyDetailPage />
       </div>
+      <SideContactButton onClick={() => setIsContactFormOpen(true)} />
+      <ContactPopupForm 
+        isOpen={isContactFormOpen} 
+        onClose={() => setIsContactFormOpen(false)} 
+      />
     </div>
   )
 }

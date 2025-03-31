@@ -41,22 +41,19 @@ const Footer = () => {
           </div>
 
           <div className="flex-1 basis-[10rem]">
-            <h2 className="text-xl font-semibold">Services</h2>
+            <h2 className="text-xl font-semibold">Properties</h2>
             <ul>
               <li className="my-3 text-muted">
-                <a href="#"> Service - 1</a>
+                <Link to="/properties">All Properties</Link>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Service - 2</a>
+                <Link to="/properties/residential">Residential</Link>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Service - 3</a>
+                <Link to="/properties/commercial">Commercial</Link>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Service - 4</a>
-              </li>
-              <li className="my-3 text-muted">
-                <a href="#">Service - 5</a>
+                <Link to="/properties/featured">Featured</Link>
               </li>
             </ul>
           </div>
@@ -65,40 +62,31 @@ const Footer = () => {
             <h2 className="text-xl font-semibold">Quick Links</h2>
             <ul>
               <li className="my-3 text-muted">
-                <a href="#"> About Us</a>
+                <Link to="/about">About Us</Link>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Services</a>
+                <Link to="/contact">Contact</Link>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Property</a>
+                <Link to="/blog">Blog</Link>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Portifolio</a>
-              </li>
-              <li className="my-3 text-muted">
-                <a href="#">Admin login</a>
+                <Link to="/agents">Our Agents</Link>
               </li>
             </ul>
           </div>
 
           <div className="flex-1 basis-[10rem]">
-            <h2 className="text-xl font-semibold">Business</h2>
+            <h2 className="text-xl font-semibold">Legal</h2>
             <ul>
               <li className="my-3 text-muted">
-                <a href="#"> Success</a>
+                <Link to="/terms-and-conditions">Terms & Conditions</Link>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Guide</a>
+                <Link to="/privacy-policy">Privacy Policy</Link>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">Mission</a>
-              </li>
-              <li className="my-3 text-muted">
-                <a href="#">Terms & Conditions</a>
-              </li>
-              <li className="my-3 text-muted">
-                <a href="#">Pricacy Policy</a>
+                <Link to="/cookie-policy">Cookie Policy</Link>
               </li>
             </ul>
           </div>
@@ -110,16 +98,14 @@ const Footer = () => {
 
             <ul>
               <li className="my-3 text-muted">
-                <a href="#"> Ph:- 0123456789</a>
+                <a href="tel:0123456789">Ph: 0123456789</a>
               </li>
               <li className="my-3 text-muted">
-                <a href="#">email :- sales@company.com</a>
+                <a href="mailto:sales@company.com">Email: sales@company.com</a>
               </li>
             </ul>
 
-
-
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold mt-6">
               Subscribe to our Newsletter
             </h2>
             <p className="text-sm text-muted">

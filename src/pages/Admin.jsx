@@ -21,6 +21,11 @@ const PropertyForm = () => {
     more_details: []
   };
 
+  // Add global styles for the admin form
+  const inputStyle = "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 bg-white";
+  const textareaStyle = "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 bg-white";
+  const flexInputStyle = "flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 bg-white";
+
   const [property, setProperty] = useState(initialState);
   const [currentLayout, setCurrentLayout] = useState({ img: "", name: "" });
   const [currentCompliance, setCurrentCompliance] = useState({ key: "", value: "" });
@@ -250,7 +255,7 @@ const PropertyForm = () => {
                 name="name"
                 value={property.name}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 required
                 placeholder="Enter venture name"
               />
@@ -262,7 +267,7 @@ const PropertyForm = () => {
                 name="distance"
                 value={property.distance}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 required
                 placeholder="e.g., 5km from city center"
               />
@@ -274,7 +279,7 @@ const PropertyForm = () => {
                 name="price"
                 value={property.price}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 required
                 placeholder="Enter property price"
               />
@@ -286,7 +291,7 @@ const PropertyForm = () => {
                 name="parking_space"
                 value={property.parking_space}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 placeholder="Enter available parking spaces"
               />
             </div>
@@ -297,7 +302,7 @@ const PropertyForm = () => {
                 name="brochure"
                 value={property.brochure}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 placeholder="Enter brochure PDF URL"
               />
             </div>
@@ -318,7 +323,7 @@ const PropertyForm = () => {
                 name="number_of_beds"
                 value={property.number_of_beds}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 required
                 placeholder="Number of bedrooms"
               />
@@ -330,7 +335,7 @@ const PropertyForm = () => {
                 name="number_of_bathrooms"
                 value={property.number_of_bathrooms}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 required
                 placeholder="Number of bathrooms"
               />
@@ -341,7 +346,7 @@ const PropertyForm = () => {
                 name="description"
                 value={property.description}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={textareaStyle}
                 rows="4"
                 required
                 placeholder="Enter property description"
@@ -443,7 +448,7 @@ const PropertyForm = () => {
                 name="video"
                 value={property.video}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 placeholder="Enter YouTube video URL"
               />
             </div>
@@ -455,7 +460,7 @@ const PropertyForm = () => {
                 name="location_map"
                 value={property.location_map}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={inputStyle}
                 placeholder="Enter Google Maps embed URL"
               />
             </div>
@@ -509,7 +514,7 @@ const PropertyForm = () => {
                 value={currentMoreDetail.key}
                 onChange={(e) => setCurrentMoreDetail(prev => ({ ...prev, key: e.target.value }))}
                 placeholder="Detail Title"
-                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={flexInputStyle}
               />
               <input
                 type="text"
@@ -517,7 +522,7 @@ const PropertyForm = () => {
                 value={currentMoreDetail.value}
                 onChange={(e) => setCurrentMoreDetail(prev => ({ ...prev, value: e.target.value }))}
                 placeholder="Detail Value"
-                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={flexInputStyle}
               />
               <button
                 type="button"
@@ -563,7 +568,7 @@ const PropertyForm = () => {
                 value={currentLayout.img}
                 onChange={handleLayoutChange}
                 placeholder="Image URL"
-                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={flexInputStyle}
               />
               <input
                 type="text"
@@ -571,7 +576,7 @@ const PropertyForm = () => {
                 value={currentLayout.name}
                 onChange={handleLayoutChange}
                 placeholder="Layout Name"
-                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={flexInputStyle}
               />
               <button
                 type="button"
@@ -617,7 +622,7 @@ const PropertyForm = () => {
                 value={currentCompliance.key}
                 onChange={handleComplianceChange}
                 placeholder="Compliance Type"
-                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={flexInputStyle}
               />
               <input
                 type="text"
@@ -625,7 +630,7 @@ const PropertyForm = () => {
                 value={currentCompliance.value}
                 onChange={handleComplianceChange}
                 placeholder="Compliance Details"
-                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className={flexInputStyle}
               />
               <button
                 type="button"

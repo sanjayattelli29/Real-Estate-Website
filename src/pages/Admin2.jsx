@@ -12,7 +12,10 @@ import {
   FaBars,
   FaTimes,
   FaEnvelope,
-  FaImage
+  FaImage,
+  FaDownload,
+  FaChevronLeft,
+  FaChevronRight
 } from "react-icons/fa";
 import PropertyForm from "./Admin";
 import { useNavigate } from "react-router-dom";
@@ -215,6 +218,24 @@ const Admin2 = () => {
     { name: "Showcase", icon: <FaImage /> }
   ];
 
+  const exportToCSV = (data, filename) => {
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => headers.map(header => row[header]).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (showLogin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -269,18 +290,18 @@ const Admin2 = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
+    <div className="min-h-screen bg-gray-900 pt-16">
       {/* Mobile Header */}
-      <div className="fixed top-16 left-0 right-0 z-20 bg-white md:hidden border-b border-gray-200 px-4 py-2">
+      <div className="fixed top-16 left-0 right-0 z-20 bg-gray-800 md:hidden border-b border-gray-700 px-4 py-2">
         <div className="flex justify-between items-center">
           <button
             onClick={toggleSidebar}
-            className="text-gray-600 hover:text-orange-600 focus:outline-none"
+            className="text-gray-400 hover:text-orange-500 focus:outline-none"
           >
             {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
           </button>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-600">Welcome, Admin</span>
+            <span className="text-gray-300">Welcome, Admin</span>
             <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center text-white text-sm">
               A
             </div>
@@ -289,11 +310,11 @@ const Admin2 = () => {
       </div>
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0 transition-transform duration-300 ease-in-out top-16`}>
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-gray-800">Admin Panel</h1>
+      <div className={`fixed inset-y-0 left-0 z-30 bg-gray-800 shadow-lg transform transition-all duration-300 ease-in-out top-16 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+      } ${isSidebarOpen ? 'w-64' : 'md:w-20'}`}>
+        <div className={`p-6 ${!isSidebarOpen && 'md:p-4'}`}>
+          <h1 className={`text-2xl font-bold text-gray-100 ${!isSidebarOpen && 'md:hidden'}`}>Admin Panel</h1>
         </div>
         <nav className="mt-6">
           {tabs.map((tab) => (
@@ -303,25 +324,30 @@ const Admin2 = () => {
                 setActiveTab(tab.name);
                 setIsSidebarOpen(false);
               }}
-              className={`w-full flex items-center px-6 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors ${
-                activeTab === tab.name ? "bg-orange-50 text-orange-600 border-r-4 border-orange-600" : ""
-              }`}
+              className={`w-full flex items-center px-6 py-3 text-gray-400 hover:bg-gray-700 hover:text-orange-500 transition-colors ${
+                activeTab === tab.name ? "bg-gray-700 text-orange-500 border-r-4 border-orange-500" : ""
+              } ${!isSidebarOpen && 'md:justify-center md:px-2'}`}
             >
               <span className="mr-3">{tab.icon}</span>
-              {tab.name}
-              {tab.hasNotification && (
-                <span className="ml-auto w-2 h-2 bg-green-500 rounded-full"></span>
-              )}
+              <span className={!isSidebarOpen ? 'md:hidden' : ''}>{tab.name}</span>
             </button>
           ))}
         </nav>
-        <div className="absolute bottom-0 w-full p-4">
+        <div className="absolute bottom-0 w-full p-4 space-y-2">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center px-6 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+            className={`w-full flex items-center px-6 py-3 text-gray-400 hover:bg-red-900/20 hover:text-red-500 transition-colors ${!isSidebarOpen && 'md:justify-center md:px-2'}`}
           >
             <FaSignOutAlt className="mr-3" />
-            Logout
+            <span className={!isSidebarOpen ? 'md:hidden' : ''}>Logout</span>
+          </button>
+          
+          {/* Toggle Button - Only visible on desktop */}
+          <button
+            onClick={toggleSidebar}
+            className="hidden md:flex w-full items-center justify-center px-4 py-2 text-gray-400 hover:text-orange-500 transition-colors bg-gray-700 rounded-lg"
+          >
+            {isSidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
           </button>
         </div>
       </div>
@@ -335,10 +361,12 @@ const Admin2 = () => {
       )}
 
       {/* Main Content */}
-      <div className="md:ml-64 p-4 md:p-8 mt-14 md:mt-0">
+      <div className={`transition-all duration-300 ease-in-out ${
+        isSidebarOpen ? 'md:ml-64' : 'md:ml-20'
+      } p-4 md:p-8 mt-14 md:mt-0`}>
         {/* Header */}
         <div className="hidden md:flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-2xl font-bold text-gray-100">
             {activeTab === "Data Upload" && "Data Upload"}
             {activeTab === "Database" && "Database Management"}
             {activeTab === "Analytics" && "Analytics Dashboard"}
@@ -347,7 +375,7 @@ const Admin2 = () => {
             {activeTab === "Showcase" && "Property Showcase"}
           </h2>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-600">Welcome, Admin</span>
+            <span className="text-gray-300">Welcome, Admin</span>
             <div className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center text-white">
               A
             </div>
@@ -356,7 +384,7 @@ const Admin2 = () => {
 
         {/* Mobile Title */}
         <div className="md:hidden mb-6">
-          <h2 className="text-xl font-bold text-gray-800">
+          <h2 className="text-xl font-bold text-gray-100">
             {activeTab === "Data Upload" && "Data Upload"}
             {activeTab === "Database" && "Database Management"}
             {activeTab === "Analytics" && "Analytics Dashboard"}
@@ -367,63 +395,72 @@ const Admin2 = () => {
         </div>
 
         {/* Content Area */}
-        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+        <div className="bg-gray-800 rounded-lg shadow-md p-4 md:p-6">
           {activeTab === "Data Upload" && <PropertyForm />}
           {activeTab === "Database" && (
             <div className="space-y-6">
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
-                  <p className="text-red-600 text-center font-medium">{error}</p>
+                <div className="p-4 bg-red-900/20 border border-red-700 rounded-lg mb-4">
+                  <p className="text-red-400 text-center font-medium">{error}</p>
                 </div>
               )}
               
               {/* Enquiries Table */}
               <div>
-                <h3 className="text-lg font-semibold mb-4">Enquiries</h3>
-                <div className="overflow-x-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-100">Enquiries</h3>
+                  <button
+                    onClick={() => exportToCSV(enquiries, 'enquiries.csv')}
+                    className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
+                  >
+                    <FaDownload className="mr-2" />
+                    Export CSV
+                  </button>
+                </div>
+                <div className="overflow-x-auto rounded-lg">
                   {loading ? (
                     <div className="flex justify-center items-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
                     </div>
                   ) : enquiries.length === 0 ? (
-                    <p className="text-center py-4 text-gray-500">No enquiries found.</p>
+                    <p className="text-center py-4 text-gray-400">No enquiries found.</p>
                   ) : (
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-gray-700">
+                      <thead className="bg-gray-700">
                         <tr>
-                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
-                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
+                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Phone</th>
+                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Property</th>
+                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date</th>
+                          <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                            {enquiries.map((enquiry) => (
-                                <tr key={enquiry._id}>
-                                <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">{enquiry.name}</td>
-                                <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">{enquiry.email}</td>
-                                <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">{enquiry.phone}</td>
-                                <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">{enquiry.property}</td>
-                                <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">{enquiry.date}</td>
-                                <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
-                                    <button 
-                                    className="text-orange-600 hover:text-orange-900 mr-3"
-                                    onClick={() => alert("Edit functionality coming soon!")}
-                                    >
-                                    <FaEdit />
-                                    </button>
-                                    <button 
-                                    className="text-red-600 hover:text-red-900"
-                                    onClick={() => handleDeleteEnquiry(enquiry._id)}
-                                    >
-                                    <FaTrash />
-                                    </button>
-                                </td>
-                                </tr>
-                            ))}
-                        </tbody>
+                      <tbody className="bg-gray-800 divide-y divide-gray-700">
+                        {enquiries.map((enquiry) => (
+                          <tr key={enquiry._id} className="hover:bg-gray-700/50">
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-300">{enquiry.name}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-300">{enquiry.email}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-300">{enquiry.phone}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-300">{enquiry.property}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-300">{enquiry.date}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
+                              <button 
+                                className="text-orange-500 hover:text-orange-400 mr-3"
+                                onClick={() => alert("Edit functionality coming soon!")}
+                              >
+                                <FaEdit />
+                              </button>
+                              <button 
+                                className="text-red-500 hover:text-red-400"
+                                onClick={() => handleDeleteEnquiry(enquiry._id)}
+                              >
+                                <FaTrash />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
                     </table>
                   )}
                 </div>
@@ -431,34 +468,46 @@ const Admin2 = () => {
 
               {/* Properties Table */}
               <div>
-                <h3 className="text-lg font-semibold mb-4">Properties</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-100">Properties</h3>
+                  <button
+                    onClick={() => exportToCSV(properties, 'properties.csv')}
+                    className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
+                  >
+                    <FaDownload className="mr-2" />
+                    Export CSV
+                  </button>
+                </div>
+                <div className="overflow-x-auto rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead className="bg-gray-700">
                       <tr>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
+                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Location</th>
+                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Price</th>
+                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                        <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-gray-800 divide-y divide-gray-700">
                       {properties.map((property) => (
-                        <tr key={property.id}>
-                          <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">{property.name}</td>
-                          <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">{property.location}</td>
-                          <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">{property.price}</td>
-                          <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                              {property.status}
+                        <tr key={property.id} className="hover:bg-gray-700/50">
+                          <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-300">{property.name}</td>
+                          <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-300">{property.location}</td>
+                          <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-300">{property.price}</td>
+                          <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-900/20 text-green-400">
+                              {property.status || 'Active'}
                             </span>
                           </td>
                           <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
-                            <button className="text-orange-600 hover:text-orange-900 mr-3">
+                            <button className="text-orange-500 hover:text-orange-400 mr-3">
                               <FaEdit />
                             </button>
-                            <button className="text-red-600 hover:text-red-900">
+                            <button 
+                              className="text-red-500 hover:text-red-400"
+                              onClick={() => handleDeleteProperty(property.id)}
+                            >
                               <FaTrash />
                             </button>
                           </td>
@@ -472,30 +521,50 @@ const Admin2 = () => {
           )}
   
           {activeTab === "Newsletter" && (
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-gray-800 rounded-lg shadow overflow-hidden">
               <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Newsletter Subscribers</h2>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-gray-100">Newsletter Subscribers</h2>
+                  <button
+                    onClick={() => exportToCSV(newsletters, 'newsletter_subscribers.csv')}
+                    className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
+                  >
+                    <FaDownload className="mr-2" />
+                    Export CSV
+                  </button>
+                </div>
+                <div className="overflow-x-auto rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead className="bg-gray-700">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                           S.no
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                           Email
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {newsletters.map((subscriber,idx) => (
-                        <tr key={subscriber.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                { idx+1 }
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                {subscriber.email}
-                            </td>
+                    <tbody className="bg-gray-800 divide-y divide-gray-700">
+                      {newsletters.map((subscriber, idx) => (
+                        <tr key={subscriber.id} className="hover:bg-gray-700/50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {idx + 1}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {subscriber.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <button 
+                              className="text-red-500 hover:text-red-400"
+                              onClick={() => handleDeleteNewsletter(subscriber.id)}
+                            >
+                              <FaTrash />
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -506,11 +575,8 @@ const Admin2 = () => {
           )}
           {activeTab === "Showcase" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {
-                    console.log(properties)
-                }
               {properties.map((property) => (
-                <div key={property._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div key={property._id} className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
                   <div className="relative h-48">
                     <img
                       src={property.banner_image || property.image[0]}
@@ -520,17 +586,17 @@ const Admin2 = () => {
                     <div className="absolute top-2 right-2">
                       <button
                         onClick={() => handleDeleteProperty(property._id)}
-                        className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                        className="bg-red-500/80 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
                       >
                         <FaTrash />
                       </button>
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{property.name}</h3>
-                    <p className="text-gray-600 text-sm mb-2">{property.distance}</p>
-                    <p className="text-orange-600 font-semibold mb-2">{property.price}</p>
-                    <div className="flex items-center text-sm text-gray-500">
+                    <h3 className="text-lg font-semibold text-gray-100 mb-2">{property.name}</h3>
+                    <p className="text-gray-400 text-sm mb-2">{property.distance}</p>
+                    <p className="text-orange-500 font-semibold mb-2">{property.price}</p>
+                    <div className="flex items-center text-sm text-gray-400">
                       <span className="mr-4">{property.number_of_beds} Beds</span>
                       <span className="mr-4">{property.number_of_bathrooms} Baths</span>
                       <span>{property.parking_space} Parking</span>

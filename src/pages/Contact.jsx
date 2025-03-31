@@ -1,12 +1,22 @@
-import { ContactInfo, Form, Map } from "../components/contact";
+import { useState } from 'react';
+import { ContactInfo } from '../components/contact';
+import { SideContactButton } from '../components/common/page-componets';
+import ContactPopupForm from '../components/common/page-componets/ContactPopupForm';
 
 const Contact = () => {
+  const [isContactFormOpen, setIsContactFormOpen] = useState(false);
+
   return (
-    <div className="pt-20 max-w-7xl mx-auto px-4">
-      <Map />
-      <ContactInfo />
-      <Form />
-    </div>
+    <>
+      <div className="pt-16">
+        <ContactInfo />
+      </div>
+      <SideContactButton onClick={() => setIsContactFormOpen(true)} />
+      <ContactPopupForm 
+        isOpen={isContactFormOpen} 
+        onClose={() => setIsContactFormOpen(false)} 
+      />
+    </>
   );
 };
 
