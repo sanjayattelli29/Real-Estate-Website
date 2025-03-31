@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { FaPlus } from "react-icons/fa";
 
 const PropertyForm = () => {
   const initialState = {
@@ -17,13 +18,14 @@ const PropertyForm = () => {
     legal_compliance: [],
     number_of_beds: "",
     number_of_bathrooms: "",
-    more_details: ""
+    more_details: []
   };
 
   const [property, setProperty] = useState(initialState);
   const [currentLayout, setCurrentLayout] = useState({ img: "", name: "" });
   const [currentCompliance, setCurrentCompliance] = useState({ key: "", value: "" });
   const [uploading, setUploading] = useState(false);
+  const [currentMoreDetail, setCurrentMoreDetail] = useState({ key: "", value: "" });
   
   // Predefined features for dropdown
   const predefinedFeatures = [
@@ -45,18 +47,17 @@ const PropertyForm = () => {
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'realestate'); // Replace with your Cloudinary upload preset
+    formData.append('upload_preset', 'realestate');
 
     try {
       const response = await fetch(
-        'https://api.cloudinary.com/v1_1/dxvjbmgta/image/upload', // Replace with your Cloudinary cloud name
+        'https://api.cloudinary.com/v1_1/dxvjbmgta/image/upload',
         {
           method: 'POST',
           body: formData,
         }
       );
       const data = await response.json();
-      console.log(data)
       return data.secure_url;
     } catch (error) {
       console.error('Error uploading to Cloudinary:', error);
@@ -69,17 +70,11 @@ const PropertyForm = () => {
     setUploading(true);
     
     try {
-      // Track existing images
       const currentImages = [...property.image];
-      
-      // Upload each file to Cloudinary and get the URLs
       const uploadPromises = files.map(file => uploadToCloudinary(file));
       const uploadedUrls = await Promise.all(uploadPromises);
-      
-      // Filter out any failed uploads
       const successfulUploads = uploadedUrls.filter(url => url !== null);
       
-      // Update state with the new image URLs
       setProperty(prev => ({
         ...prev,
         image: [...currentImages, ...successfulUploads]
@@ -113,9 +108,13 @@ const PropertyForm = () => {
     }
   };
 
-  const handleFeatureChange = (e) => {
-    const value = Array.from(e.target.selectedOptions, option => option.value);
-    setProperty(prev => ({ ...prev, features: value }));
+  const handleFeatureToggle = (feature) => {
+    setProperty(prev => ({
+      ...prev,
+      features: prev.features.includes(feature)
+        ? prev.features.filter(f => f !== feature)
+        : [...prev.features, feature]
+    }));
   };
 
   const addLayout = () => {
@@ -146,6 +145,23 @@ const PropertyForm = () => {
   const handleComplianceChange = (e) => {
     const { name, value } = e.target;
     setCurrentCompliance(prev => ({ ...prev, [name]: value }));
+  };
+
+  const addMoreDetail = () => {
+    if (currentMoreDetail.key && currentMoreDetail.value) {
+      setProperty(prev => ({
+        ...prev,
+        more_details: [...prev.more_details, { ...currentMoreDetail }]
+      }));
+      setCurrentMoreDetail({ key: "", value: "" });
+    }
+  };
+
+  const removeMoreDetail = (index) => {
+    setProperty(prev => ({
+      ...prev,
+      more_details: prev.more_details.filter((_, i) => i !== index)
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -203,317 +219,453 @@ const PropertyForm = () => {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto p-4 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center mt-12">Add New Property</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Basic Fields */}
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="flex justify-between items-center mb-8">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Venture Name</label>
-          <input
-            type="text"
-            name="name"
-            value={property.name}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            required
-          />
+          <h3 className="text-2xl font-bold text-gray-800">Add New Property</h3>
+          <p className="text-gray-600 mt-1">Fill in the details below to add a new property listing</p>
         </div>
+        <button
+          onClick={handleSubmit}
+          disabled={uploading}
+          className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors flex items-center shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <FaPlus className="mr-2" />
+          {uploading ? "Uploading..." : "Add Property"}
+        </button>
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Distance</label>
-          <input
-            type="text"
-            name="distance"
-            value={property.distance}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Price</label>
-          <input
-            type="text"
-            name="price"
-            value={property.price}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Description</label>
-          <textarea
-            name="description"
-            value={property.description}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            rows="3"
-            required
-          ></textarea>
-        </div>
-
-        {/* Bedroom and Bathroom Fields */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Bedrooms</label>
-          <input
-            type="text"
-            name="bedrooms"
-            value={property.number_of_beds}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Bathrooms</label>
-          <input
-            type="text"
-            name="bathrooms"
-            value={property.number_of_bathrooms}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">More Details</label>
-          <textarea
-            name="more_details"
-            value={property.more_details}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            rows="3"
-          ></textarea>
-        </div>
-
-        {/* New Fields */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Brochure URL</label>
-          <input
-            type="text"
-            name="brochure"
-            value={property.brochure}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            placeholder="Enter brochure URL"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Parking Space (in sqft)</label>
-          <input
-            type="text"
-            name="parking_space"
-            value={property.parking_space}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            placeholder="Enter available parking spaces"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Banner Image</label>
-          <input
-            type="file"
-            name="banner_image"
-            onChange={handleBannerImageUpload}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            accept="image/*"
-            disabled={uploading}
-          />
-          {uploading && <p className="text-blue-500 mt-1">Uploading banner image...</p>}
-          {property.banner_image && (
-            <div className="mt-2">
-              <p>Banner image uploaded successfully!</p>
-              <img 
-                src={property.banner_image} 
-                alt="Banner preview" 
-                className="mt-2 max-h-32 rounded"
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Basic Information Section */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+          <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <span className="w-1 h-6 bg-orange-500 rounded-full mr-3"></span>
+            Basic Information
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Venture Name</label>
+              <input
+                type="text"
+                name="name"
+                value={property.name}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                required
+                placeholder="Enter venture name"
               />
             </div>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Features</label>
-          <select
-            multiple
-            name="features"
-            value={property.features}
-            onChange={handleFeatureChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            size="5"
-          >
-            {predefinedFeatures.map(feature => (
-              <option key={feature} value={feature}>{feature}</option>
-            ))}
-          </select>
-          <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple features</p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Property Images</label>
-          <input
-            type="file"
-            multiple
-            onChange={handleImageUpload}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            accept="image/*"
-            disabled={uploading}
-          />
-          {uploading && <p className="text-blue-500 mt-1">Uploading images...</p>}
-          {property.image.length > 0 && (
-            <div className="mt-2">
-              <p>Uploaded Images ({property.image.length}):</p>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {property.image.map((img, index) => (
-                  <div key={index} className="relative">
-                    <img 
-                      src={img} 
-                      alt={`Property ${index}`}
-                      className="w-16 h-16 object-cover rounded" 
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Distance</label>
+              <input
+                type="text"
+                name="distance"
+                value={property.distance}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                required
+                placeholder="e.g., 5km from city center"
+              />
             </div>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Layouts</label>
-          <div className="flex space-x-2 mb-2">
-            <input
-              type="text"
-              name="img"
-              value={currentLayout.img}
-              onChange={handleLayoutChange}
-              placeholder="Image URL"
-              className="p-2 flex-1 border rounded-md bg-indigo-50"
-            />
-            <input
-              type="text"
-              name="name"
-              value={currentLayout.name}
-              onChange={handleLayoutChange}
-              placeholder="Layout Name"
-              className="p-2 flex-1 border rounded-md bg-indigo-50"
-            />
-            <button
-              type="button"
-              onClick={addLayout}
-              className="bg-blue-500 text-white px-3 py-1 rounded-md"
-            >
-              Add
-            </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
+              <input
+                type="text"
+                name="price"
+                value={property.price}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                required
+                placeholder="Enter property price"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Parking Space</label>
+              <input
+                type="text"
+                name="parking_space"
+                value={property.parking_space}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                placeholder="Enter available parking spaces"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Brochure URL</label>
+              <input
+                type="text"
+                name="brochure"
+                value={property.brochure}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                placeholder="Enter brochure PDF URL"
+              />
+            </div>
           </div>
-          {property.layouts.length > 0 && (
-            <ul className="mt-2 border p-2 rounded-md">
-              {property.layouts.map((layout, index) => (
-                <li key={index} className="flex justify-between items-center mb-1">
-                  <span>{layout.name} - {layout.img.substring(0, 20)}...</span>
-                  <button
-                    type="button"
-                    onClick={() => removeLayout(index)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">YouTube Video Embed</label>
-          <input
-            type="text"
-            name="video"
-            value={property.video}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            placeholder="Enter YouTube embed code"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Location Map URL</label>
-          <input
-            type="text"
-            name="location_map"
-            value={property.location_map}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded-md bg-indigo-50"
-            placeholder="Enter Google Maps or location map URL"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Legal Compliance</label>
-          <div className="flex space-x-2 mb-2">
-            <input
-              type="text"
-              name="key"
-              value={currentCompliance.key}
-              onChange={handleComplianceChange}
-              placeholder="Compliance Type"
-              className="p-2 flex-1 border rounded-md bg-indigo-50"
-            />
-            <input
-              type="text"
-              name="value"
-              value={currentCompliance.value}
-              onChange={handleComplianceChange}
-              placeholder="Compliance Details"
-              className="p-2 flex-1 border rounded-md bg-indigo-50"
-            />
-            <button
-              type="button"
-              onClick={addCompliance}
-              className="bg-blue-500 text-white px-3 py-1 rounded-md"
-            >
-              Add
-            </button>
+        {/* Property Details Section */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+          <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <span className="w-1 h-6 bg-orange-500 rounded-full mr-3"></span>
+            Property Details
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bedrooms</label>
+              <input
+                type="text"
+                name="number_of_beds"
+                value={property.number_of_beds}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                required
+                placeholder="Number of bedrooms"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bathrooms</label>
+              <input
+                type="text"
+                name="number_of_bathrooms"
+                value={property.number_of_bathrooms}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                required
+                placeholder="Number of bathrooms"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                name="description"
+                value={property.description}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                rows="4"
+                required
+                placeholder="Enter property description"
+              ></textarea>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">More Details</label>
+              <textarea
+                name="more_details"
+                value={property.more_details}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                rows="4"
+                placeholder="Enter additional details"
+              ></textarea>
+            </div>
           </div>
-          {property.legal_compliance.length > 0 && (
-            <ul className="mt-2 border p-2 rounded-md">
-              {property.legal_compliance.map((item, index) => (
-                <li key={index} className="flex justify-between items-center mb-1">
-                  <span>{item.key}: {item.value}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeCompliance(index)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
 
-        <div className="text-center">
-          <button
-            type="submit"
-            className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700"
-            disabled={uploading}
-          >
-            {uploading ? "Uploading..." : "Add Property"}
-          </button>
+        {/* Media Section */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+          <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <span className="w-1 h-6 bg-orange-500 rounded-full mr-3"></span>
+            Media
+          </h4>
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Banner Image</label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-orange-500 transition-colors">
+                <div className="space-y-1 text-center">
+                  <input
+                    type="file"
+                    name="banner_image"
+                    onChange={handleBannerImageUpload}
+                    className="hidden"
+                    id="banner-upload"
+                    accept="image/*"
+                    disabled={uploading}
+                  />
+                  <label
+                    htmlFor="banner-upload"
+                    className="cursor-pointer bg-white rounded-md font-medium text-orange-600 hover:text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-orange-500"
+                  >
+                    <span>Upload a file</span>
+                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                  </label>
+                </div>
+              </div>
+              {property.banner_image && (
+                <div className="mt-4">
+                  <img 
+                    src={property.banner_image} 
+                    alt="Banner preview" 
+                    className="max-h-40 rounded-lg shadow-sm"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Property Images</label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-orange-500 transition-colors">
+                <div className="space-y-1 text-center">
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="property-images"
+                    accept="image/*"
+                    disabled={uploading}
+                  />
+                  <label
+                    htmlFor="property-images"
+                    className="cursor-pointer bg-white rounded-md font-medium text-orange-600 hover:text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-orange-500"
+                  >
+                    <span>Upload multiple files</span>
+                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                  </label>
+                </div>
+              </div>
+              {property.image.length > 0 && (
+                <div className="mt-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {property.image.map((img, index) => (
+                      <div key={index} className="relative group">
+                        <img 
+                          src={img} 
+                          alt={`Property ${index}`}
+                          className="w-full h-32 object-cover rounded-lg shadow-sm" 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">YouTube Video URL</label>
+              <input
+                type="text"
+                name="video"
+                value={property.video}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                placeholder="Enter YouTube video URL"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location Map URL</label>
+              <input
+                type="text"
+                name="location_map"
+                value={property.location_map}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                placeholder="Enter Google Maps embed URL"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+          <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <span className="w-1 h-6 bg-orange-500 rounded-full mr-3"></span>
+            Features & Amenities
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {predefinedFeatures.map(feature => (
+              <button
+                key={feature}
+                type="button"
+                onClick={() => handleFeatureToggle(feature)}
+                className={`p-4 rounded-lg border-2 transition-all flex items-center justify-between ${
+                  property.features.includes(feature)
+                    ? 'border-orange-500 bg-orange-50'
+                    : 'border-gray-200 hover:border-orange-300'
+                }`}
+              >
+                <span className="font-medium">{feature}</span>
+                {property.features.includes(feature) ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* More Details Section */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+          <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <span className="w-1 h-6 bg-orange-500 rounded-full mr-3"></span>
+            Additional Details
+          </h4>
+          <div className="space-y-6">
+            <div className="flex space-x-4">
+              <input
+                type="text"
+                name="key"
+                value={currentMoreDetail.key}
+                onChange={(e) => setCurrentMoreDetail(prev => ({ ...prev, key: e.target.value }))}
+                placeholder="Detail Title"
+                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              />
+              <input
+                type="text"
+                name="value"
+                value={currentMoreDetail.value}
+                onChange={(e) => setCurrentMoreDetail(prev => ({ ...prev, value: e.target.value }))}
+                placeholder="Detail Value"
+                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={addMoreDetail}
+                className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors shadow-md hover:shadow-lg"
+              >
+                Add Detail
+              </button>
+            </div>
+            {property.more_details.length > 0 && (
+              <div className="border rounded-lg p-4 bg-gray-50">
+                <h5 className="text-sm font-medium text-gray-700 mb-3">Added Details:</h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {property.more_details.map((detail, index) => (
+                    <div key={index} className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-sm"><span className="font-medium">{detail.key}:</span> {detail.value}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeMoreDetail(index)}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Layouts Section */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+          <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <span className="w-1 h-6 bg-orange-500 rounded-full mr-3"></span>
+            Floor Plans & Layouts
+          </h4>
+          <div className="space-y-6">
+            <div className="flex space-x-4">
+              <input
+                type="text"
+                name="img"
+                value={currentLayout.img}
+                onChange={handleLayoutChange}
+                placeholder="Image URL"
+                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              />
+              <input
+                type="text"
+                name="name"
+                value={currentLayout.name}
+                onChange={handleLayoutChange}
+                placeholder="Layout Name"
+                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={addLayout}
+                className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors shadow-md hover:shadow-lg"
+              >
+                Add Layout
+              </button>
+            </div>
+            {property.layouts.length > 0 && (
+              <div className="border rounded-lg p-4 bg-gray-50">
+                <h5 className="text-sm font-medium text-gray-700 mb-3">Added Layouts:</h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {property.layouts.map((layout, index) => (
+                    <div key={index} className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-sm">{layout.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeLayout(index)}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Legal Compliance Section */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+          <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <span className="w-1 h-6 bg-orange-500 rounded-full mr-3"></span>
+            Legal Compliance
+          </h4>
+          <div className="space-y-6">
+            <div className="flex space-x-4">
+              <input
+                type="text"
+                name="key"
+                value={currentCompliance.key}
+                onChange={handleComplianceChange}
+                placeholder="Compliance Type"
+                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              />
+              <input
+                type="text"
+                name="value"
+                value={currentCompliance.value}
+                onChange={handleComplianceChange}
+                placeholder="Compliance Details"
+                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={addCompliance}
+                className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors shadow-md hover:shadow-lg"
+              >
+                Add
+              </button>
+            </div>
+            {property.legal_compliance.length > 0 && (
+              <div className="border rounded-lg p-4 bg-gray-50">
+                <h5 className="text-sm font-medium text-gray-700 mb-3">Added Compliance Items:</h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {property.legal_compliance.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-sm">{item.key}: {item.value}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeCompliance(index)}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </form>
     </div>
